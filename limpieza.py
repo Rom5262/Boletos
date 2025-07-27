@@ -11,7 +11,7 @@ def procesar_datos():
     Carga, limpia y fusiona todos los DataFrames para el análisis.
     Retorna el DataFrame final procesado.
     """
-    try:
+try:
         
         visitas = pd.read_csv('datos/visits_log_us.csv')
         pedidos = pd.read_csv('datos/orders_log_us.csv')
