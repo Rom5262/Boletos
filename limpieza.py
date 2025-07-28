@@ -11,18 +11,18 @@ def procesar_datos():
     Carga, limpia y fusiona todos los DataFrames para el análisis.
     Retorna el DataFrame final procesado.
     """
-try:
+    try:
         
         visitas = pd.read_csv('datos/visits_log_us.csv')
         pedidos = pd.read_csv('datos/orders_log_us.csv')
         gastos = pd.read_csv('datos/costs_us.csv')
         
-except FileNotFoundError as e:
-    print(f"Error: Uno de los archivos CSV no fue encontrado. Por favor, verifica la ruta: {e}")
-    return None # Retorna None si no se pueden cargar los archivos
-except Exception as e:
-    print(f"Error al cargar los datos: {e}")
-    return None       
+    except FileNotFoundError as e:
+        print(f"Error: Uno de los archivos CSV no fue encontrado. Por favor, verifica la ruta: {e}")
+        return None # Retorna None si no se pueden cargar los archivos
+    except Exception as e:
+        print(f"Error al cargar los datos: {e}")
+        return None       
 
     if 'Start Ts' in visitas.columns and 'End Ts' in visitas.columns:
         visitas['Start Ts'] = pd.to_datetime(visitas['Start Ts'])
