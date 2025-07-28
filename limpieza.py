@@ -49,5 +49,6 @@ def procesar_datos():
     gastos = gastos.drop_duplicates() 
     gastos = gastos.reset_index(drop=True)
 
-    return visitas
+    return visitas, pedidos, gastos
+
 

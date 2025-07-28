@@ -14,6 +14,8 @@ st.set_page_config(
     page_title="📱 Análisis de Negocio de la Venta de Entradas de SHOWZ ",
     layout="wide")
 
+st.title("📱 Análisis de Negocio de la Venta de Entradas de SHOWZ")
+
 st.title("Visualización Dashboard")
 st.markdown("### 📊 Visualización de las diferentes Dashboard del Proyecto")
 
@@ -32,6 +34,7 @@ with st.expander("Introducción", expanded=True):
      """)
 
 final_data = load_data()  
+visitas, pedidos, gastos = final_data 
 
 st.markdown("---")
 st.title('VISITAS')    
@@ -58,7 +61,10 @@ if final_data is not None:
         ax.set_title('Conexiones por Tipo de Dispositivo')
         st.pyplot(fig)
 
+        
+
     else:
             st.info("No hay datos para mostrar el gráfico de conexiones por dispositivo.")
 else:
     st.error("No se pudieron cargar los datos. Por favor, revisa tu script `limpieza.py` y las rutas de los archivos CSV.")
+    
