@@ -1,3 +1,4 @@
+
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
@@ -9,7 +10,9 @@ from scipy import stats as st
 def procesar_datos():
     """
     Carga, limpia y fusiona todos los DataFrames para el análisis.
-    Retorna el DataFrame final procesado.
+    
+    Retorna:
+        DataFrame: El DataFrame final procesado y fusionado, o None si hay un error.
     """
     try:
         
@@ -19,36 +22,32 @@ def procesar_datos():
         
     except FileNotFoundError as e:
         print(f"Error: Uno de los archivos CSV no fue encontrado. Por favor, verifica la ruta: {e}")
-        return None # Retorna None si no se pueden cargar los archivos
+        return None
     except Exception as e:
         print(f"Error al cargar los datos: {e}")
-        return None       
+        return None
 
-    if 'Start Ts' in visitas.columns and 'End Ts' in visitas.columns:
-        visitas['Start Ts'] = pd.to_datetime(visitas['Start Ts'])
-        visitas['End Ts'] = pd.to_datetime(visitas['End Ts'])
-    else:
-        print("Advertencia: Columnas 'Start Ts' o 'End Ts' no encontradas en 'visitas' para conversión a datetime.")
+    
+    visitas = visitas.drop_duplicates().reset_index(drop=True)
+    visitas['Start Ts'] = pd.to_datetime(visitas['Start Ts'], errors='coerce')
+    visitas['End Ts'] = pd.to_datetime(visitas['End Ts'], errors='coerce')
+    visitas.dropna(subset=['Start Ts', 'End Ts'], inplace=True)
+    visitas['mes_inicio'] = visitas['Start Ts'].dt.to_period('M')
 
-    visitas = visitas.drop_duplicates()
-    visitas = visitas.reset_index(drop=True)
+    pedidos = pedidos.drop_duplicates().reset_index(drop=True)
+    pedidos['Buy Ts'] = pd.to_datetime(pedidos['Buy Ts'], errors='coerce')
+    pedidos.dropna(subset=['Buy Ts'], inplace=True)
+    pedidos['mes_orden'] = pedidos['Buy Ts'].dt.to_period('M')
 
-    if 'Buy Ts' in pedidos.columns:
-        pedidos['Buy Ts'] = pd.to_datetime(pedidos['Buy Ts'])
-    else:
-        print("Advertencia: Columna 'Buy Ts' no encontrada en 'pedidos' para conversión a datetime.")
-        
-    pedidos = pedidos.drop_duplicates()
-    pedidos = pedidos.reset_index(drop=True)
+    gastos = gastos.drop_duplicates().reset_index(drop=True)
+    gastos['dt'] = pd.to_datetime(gastos['dt'], errors='coerce')
+    gastos.dropna(subset=['dt'], inplace=True)
+    gastos['mes_gasto'] = gastos['dt'].dt.to_period('M')
 
-    if 'dt' in gastos.columns:
-        gastos['dt'] = pd.to_datetime(gastos['dt'])
-    else:
-        print("Advertencia: Columna 'dt' no encontrada en 'gastos' para conversión a datetime.")
-        
-    gastos = gastos.drop_duplicates() 
-    gastos = gastos.reset_index(drop=True)
-
+    primera_compra = pedidos.groupby('Uid')['Buy Ts'].min().to_frame(name='primera_compra_ts').reset_index()
+    primera_compra['mes_cohorte'] = primera_compra['primera_compra_ts'].dt.to_period('M')
+    
+    pedidos = pd.merge(pedidos, primera_compra, on='Uid', how='left')
+    
     return visitas, pedidos, gastos
-
 
